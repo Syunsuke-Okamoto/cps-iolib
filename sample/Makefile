@@ -1,5 +1,6 @@
 obj-m := gpmc_testd.o
 GCC=gcc
+#GCC=arm-linux-gnueabi-gcc
 
 EXTRA_CFLAGS	:= -DDEBUG=0
 

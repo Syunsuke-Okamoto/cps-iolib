@@ -1,6 +1,6 @@
 /*
  *  Driver for cps-iolib with CPS-MCS341.
- * Version 1.0.0
+ * Version 1.0.2
  *
  *  I/O Control CPS-MCS341 Series (only) Driver by CONTEC .
  *
@@ -59,6 +59,7 @@ static dev_t cpsio_dev;
 
 static void __iomem *map_baseaddr ;
 
+static unsigned int ref_count;
 
 /***** file operation functions *******************************/
 
@@ -154,23 +155,30 @@ static int cpsio_open(struct inode *inode, struct file *filp )
 	inode->i_private = inode;
 	filp->private_data = filp;
 
-	/* I/O Mapping */
-	allocaddr = cps_common_mem_alloc( 0x08000000, 0x2000, "", CPS_COMMON_MEM_NONREGION );
 
-	if( !allocaddr ){
+	if( ref_count == 0 ) {
+		/* I/O Mapping */
+		allocaddr = cps_common_mem_alloc( 0x08000000, 0x2100, "", CPS_COMMON_MEM_NONREGION );
+
+		if( !allocaddr ){
 			printk(KERN_INFO "cpsio : MEMORY cannot allocation. [%lx]", (unsigned long)map_baseaddr );
 			return -ENOMEM;
-	}else{
-		map_baseaddr = allocaddr;
+		}else{
+			map_baseaddr = allocaddr;
+		}
 	}
 
+	ref_count ++;
 	return 0;
 }
 
 static int cpsio_close(struct inode * inode, struct file *file ){
 
-	cps_common_mem_release( 0x08000000, 0x2000, map_baseaddr, CPS_COMMON_MEM_NONREGION );
 
+	ref_count --;
+	if( ref_count == 0){
+		cps_common_mem_release( 0x08000000, 0x2100, map_baseaddr, CPS_COMMON_MEM_NONREGION );
+	}
 	return 0;
 }
 
@@ -244,6 +252,8 @@ static int cpsio_init(void)
 			return PTR_ERR(devlp);
 		}
 	}
+
+	ref_count = 0;
 
 	return 0;
 

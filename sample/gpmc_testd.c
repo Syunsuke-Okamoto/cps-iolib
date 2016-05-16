@@ -14,7 +14,7 @@
 #include "cps-iolib.h"
 
 #define DEVNAME "/dev/cps-iolib0"
-#define SAMP_VER "1.0.0"
+#define SAMP_VER "1.0.2"
 
 void para_err(){
 	printf("*******************************************\n");
@@ -26,15 +26,22 @@ void para_err(){
 	printf( "BYTE access \n" );
 	printf( " gpmc_testd -r1 address  \n" );
 	printf( " gpmc_testd -w1 address data \n" );
+	printf( "TEST access \n" );
+	printf( " gpmc_testd -t address \n" );
+	printf( " gpmc_testd -t1 address \n" );
+	printf( " gpmc_testd -t address data1 data2 \n");
+	printf( " gpmc_testd -t1 address data1 data2 \n");
 }
+
+struct cpsio_ioctl_arg arg;
+struct cpsio_ioctl_arg arg_r;
 
 int main(int argc, char *argv[]){
 	int fd;
 	unsigned long from,num,port;
-	unsigned int adr, dat;
+	unsigned int adr, dat, dat2;
 	int w_flg=0;
 	int b_flg=0;
-	struct cpsio_ioctl_arg arg;
 
 	if( argc<3 ){
 		para_err();
@@ -52,6 +59,17 @@ int main(int argc, char *argv[]){
 	}else if( memcmp( argv[1], "-r", 2 )==0){
 		if( memcmp( argv[1], "-r1", 3 )==0 )b_flg=1;
 		sscanf( argv[2], "%x", &adr );
+	}else if( memcmp( argv[1], "-t", 2 )==0){
+		if( memcmp( argv[1], "-t1", 3 )==0 )b_flg=1;
+		sscanf( argv[2], "%x", &adr );
+		w_flg=2;
+		if( argc > 4 ){
+			sscanf( argv[3] , "%x", &dat );
+			sscanf( argv[4] , "%x", &dat2 );
+		}else{
+			dat = 0x55;
+			dat2 = 0xaa;
+		}
 	}else{
 		para_err();
 		exit(1);
@@ -64,7 +82,7 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	if( w_flg ){
+	if( w_flg==1 ){
 		arg.addr	= adr;
 		arg.val		= dat;
 		
@@ -75,6 +93,31 @@ int main(int argc, char *argv[]){
 			printf( "write adr[0x%x] = [%x]\n", adr, dat & 0xffff  );
 			ioctl( fd, IOCTL_CPSIO_OUTWORD, &arg);	
 		}
+	}else if( w_flg==2 ){
+		int i;
+		arg.addr	= adr;
+		for(i=0;;i++){
+		  if( i%2 == 0 )	arg.val = dat;
+		  else			arg.val = dat2;
+		  if( b_flg ){
+			ioctl( fd, IOCTL_CPSIO_OUTBYTE, &arg);	
+		  }else{
+			ioctl( fd, IOCTL_CPSIO_OUTWORD, &arg);	
+		  }
+		  // read back
+		  arg_r.addr	= adr;
+		  arg_r.val=0;
+		  if( b_flg ){
+			ioctl( fd, IOCTL_CPSIO_INPBYTE, &arg_r);
+		  }else{
+			ioctl( fd, IOCTL_CPSIO_INPWORD, &arg_r);
+		  }
+		  if( arg.val != arg_r.val ){
+		     printf( "compare ng(%d)[%x]<>[%x]\n", i, arg.val, arg_r.val );
+		     break;
+		  }
+		}
+
 	}else{
 		arg.addr = adr;
 		if( b_flg ){
