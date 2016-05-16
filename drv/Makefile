@@ -1,14 +1,19 @@
 obj-m := cps-iolib.o
-CC=gcc
 
-
-KERNELDIR ?= /lib/modules/$(shell uname -r)/build 
+#self-build
+#CC=gcc
+#KERNELDIR ?= /lib/modules/$(shell uname -r)/build 
 PWD       := $(shell pwd)
 
 EXTRA_CFLAGS	:= -DDEBUG=0
 
+#cross build 
+CROSS_COMPILE=arm-linux-gnueabi-
+ARCH=arm
+KERNELDIR ?= /home/contec/workspace/sdk/CPS_SDK/kernel #target kernel source path
+
 all:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD)
+	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNELDIR) M=$(PWD) modules
 
 modules_install:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install

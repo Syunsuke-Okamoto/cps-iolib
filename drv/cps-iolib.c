@@ -1,6 +1,6 @@
 /*
  *  Driver for cps-iolib with CPS-MCS341.
- * Version 1.0.2
+ * Version 1.0.3
  *
  *  I/O Control CPS-MCS341 Series (only) Driver by CONTEC .
  *
@@ -35,7 +35,7 @@
 
 #include "cps_common_io.h"
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("CONTEC I/O Driver for CPS-MCS341");
 MODULE_AUTHOR("CONTEC");
 
@@ -151,22 +151,22 @@ static long cpsio_ioctl( struct file *filp, unsigned int cmd, unsigned long arg 
 
 static int cpsio_open(struct inode *inode, struct file *filp )
 {
-	void __iomem *allocaddr = NULL;
+//	void __iomem *allocaddr = NULL;
 	inode->i_private = inode;
 	filp->private_data = filp;
 
 
-	if( ref_count == 0 ) {
+//	if( ref_count == 0 ) {
 		/* I/O Mapping */
-		allocaddr = cps_common_mem_alloc( 0x08000000, 0x2100, "", CPS_COMMON_MEM_NONREGION );
+//		allocaddr = cps_common_mem_alloc( 0x08000000, 0x2100, "", CPS_COMMON_MEM_NONREGION );
 
-		if( !allocaddr ){
-			printk(KERN_INFO "cpsio : MEMORY cannot allocation. [%lx]", (unsigned long)map_baseaddr );
-			return -ENOMEM;
-		}else{
-			map_baseaddr = allocaddr;
-		}
-	}
+//		if( !allocaddr ){
+//			printk(KERN_INFO "cpsio : MEMORY cannot allocation. [%lx]", (unsigned long)map_baseaddr );
+//			return -ENOMEM;
+//		}else{
+//			map_baseaddr = allocaddr;
+//		}
+//	}
 
 	ref_count ++;
 	return 0;
@@ -176,9 +176,9 @@ static int cpsio_close(struct inode * inode, struct file *file ){
 
 
 	ref_count --;
-	if( ref_count == 0){
-		cps_common_mem_release( 0x08000000, 0x2100, map_baseaddr, CPS_COMMON_MEM_NONREGION );
-	}
+//	if( ref_count == 0){
+//		cps_common_mem_release( 0x08000000, 0x2100, map_baseaddr, CPS_COMMON_MEM_NONREGION );
+//	}
 	return 0;
 }
 
@@ -253,6 +253,14 @@ static int cpsio_init(void)
 		}
 	}
 
+	/* I/O Mapping */
+	map_baseaddr = cps_common_mem_alloc( 0x08000000, 0x2100, "", CPS_COMMON_MEM_NONREGION );
+
+	if( !map_baseaddr ){
+		printk(KERN_INFO "cpsio : MEMORY cannot allocation. [%lx]", (unsigned long)map_baseaddr );
+		return -ENOMEM;
+	}
+
 	ref_count = 0;
 
 	return 0;
@@ -264,6 +272,9 @@ static void cpsio_exit(void)
 
 	dev_t dev = MKDEV(cpsio_major , 0 );
 	int cnt;
+
+	/* I/O UnMapping */
+	cps_common_mem_release( 0x08000000, 0x2100, map_baseaddr, CPS_COMMON_MEM_NONREGION );
 
 	for( cnt = cpsio_minor; cnt < ( cpsio_minor + cpsio_max_devs ) ; cnt ++){
 		cpsio_dev = MKDEV( cpsio_major , cnt );

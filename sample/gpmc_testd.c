@@ -14,7 +14,7 @@
 #include "cps-iolib.h"
 
 #define DEVNAME "/dev/cps-iolib0"
-#define SAMP_VER "1.0.2"
+#define SAMP_VER "1.0.3"
 
 void para_err(){
 	printf("*******************************************\n");
@@ -31,6 +31,11 @@ void para_err(){
 	printf( " gpmc_testd -t1 address \n" );
 	printf( " gpmc_testd -t address data1 data2 \n");
 	printf( " gpmc_testd -t1 address data1 data2 \n");
+	printf( "LOOP access \n" );
+	printf( " gpmc_testd -r1 -l address data \n" );
+	printf( " gpmc_testd -r -l address \n" );
+	printf( " gpmc_testd -w1 -l address data \n");
+	printf( " gpmc_testd -w -l address data \n");
 }
 
 struct cpsio_ioctl_arg arg;
@@ -42,6 +47,8 @@ int main(int argc, char *argv[]){
 	unsigned int adr, dat, dat2;
 	int w_flg=0;
 	int b_flg=0;
+	int l_flg=0;
+	int i = 0;
 
 	if( argc<3 ){
 		para_err();
@@ -53,12 +60,23 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 		if( memcmp( argv[1], "-w1", 3 )==0 )b_flg=1;
-		sscanf( argv[2], "%x", &adr );
-		sscanf( argv[3], "%x", &dat );
+
+		if( memcmp( argv[2], "-l", 2 ) == 0 ){
+			l_flg=1;
+		}
+
+		sscanf( argv[2 + l_flg], "%x", &adr );
+		sscanf( argv[3 + l_flg], "%x", &dat );
 		w_flg=1;
 	}else if( memcmp( argv[1], "-r", 2 )==0){
 		if( memcmp( argv[1], "-r1", 3 )==0 )b_flg=1;
-		sscanf( argv[2], "%x", &adr );
+
+		if( memcmp( argv[2], "-l", 2 ) == 0 ){
+			l_flg=1;
+			sscanf( argv[4], "%x", &dat );
+		}
+		sscanf( argv[2 + l_flg], "%x", &adr );
+
 	}else if( memcmp( argv[1], "-t", 2 )==0){
 		if( memcmp( argv[1], "-t1", 3 )==0 )b_flg=1;
 		sscanf( argv[2], "%x", &adr );
@@ -94,7 +112,7 @@ int main(int argc, char *argv[]){
 			ioctl( fd, IOCTL_CPSIO_OUTWORD, &arg);	
 		}
 	}else if( w_flg==2 ){
-		int i;
+
 		arg.addr	= adr;
 		for(i=0;;i++){
 		  if( i%2 == 0 )	arg.val = dat;
@@ -119,14 +137,25 @@ int main(int argc, char *argv[]){
 		}
 
 	}else{
-		arg.addr = adr;
-		if( b_flg ){
-			ioctl( fd, IOCTL_CPSIO_INPBYTE, &arg);
-			printf( "read adr[0x%x] = [%x]\n", arg.addr,arg.val ); 
-		}else{
-			ioctl( fd, IOCTL_CPSIO_INPWORD, &arg);
-			printf( "read adr[0x%x] = [%x]\n", arg.addr, arg.val ); 
-		}
+		i = 1;
+		do{
+			arg.addr = adr;
+			if( b_flg ){
+				ioctl( fd, IOCTL_CPSIO_INPBYTE, &arg);
+				if( l_flg == 0 ) printf( "read adr[0x%x] = [%x]\n", arg.addr,arg.val ); 
+			}else{
+				ioctl( fd, IOCTL_CPSIO_INPWORD, &arg);
+				if( l_flg == 0 ) printf( "read adr[0x%x] = [%x]\n", arg.addr, arg.val ); 
+			}
+			if( l_flg ){
+				if( dat != arg.val ){
+					printf( "compare ng(%d)[%x]<>[%x]\n", i, dat, arg.val );
+					break;
+				}
+				i ++;
+			}
+	
+		}	while( l_flg );
 	}
 
 

@@ -122,7 +122,7 @@ void cps_common_outw(unsigned long addr, unsigned short data )
 static void __iomem *cps_common_mem_alloc( unsigned long baseMemory, unsigned int areaSize, char* drvName , unsigned int isRegion )
 {
 	int ret = 0;
-	void __iomem *mappedAddress;
+	void __iomem *mappedAddress = NULL;
 	if( isRegion ){
 		if (!request_mem_region((resource_size_t)baseMemory, areaSize, drvName)) {
 			ret = -EBUSY;
@@ -146,7 +146,7 @@ static int cps_common_mem_release( unsigned long baseMemory, unsigned int areaSi
 {
 	int ret = 0;
 
-	if (!mappedAddress ) {
+	if ( mappedAddress ) {
 		if ( isRegion ){
 			release_mem_region(baseMemory, areaSize);
 		}
