@@ -2,13 +2,13 @@
 	@file cps-iolib.c
 	@brief CONPROSYS IO-LIB Driver with CPS-MCS341.
 	@author Syunsuke Okamoto <okamoto@contec.jp>
-	@par Version 1.0.3
+	@par Version 1.0.5
 	@par Copyright 2015  CONTEC Co., Ltd.
 	@par License : GPL Ver.2
 **/
 /*
  *  cps-iolib Driver with CPS-MCS341.
- * Version 1.0.4
+ * Version 1.0.5
  *
  *  I/O Control CPS-MCS341 Series (only) Driver by CONTEC .
  *
@@ -43,11 +43,11 @@
 
 #include "cps_common_io.h"
 
-#define DRV_VERSION	"1.0.4"
+#define DRV_VERSION	"1.0.5"
 
 MODULE_LICENSE("GPL v2");
-MODULE_ALIAS("CONTEC I/O Driver for CPS-MCS341");
-MODULE_AUTHOR("CONTEC");
+MODULE_DESCRIPTION("CONTEC I/O Driver for CPS-MCS341");
+MODULE_AUTHOR("syunsuke okamoto");
 
 MODULE_VERSION(DRV_VERSION);
 
