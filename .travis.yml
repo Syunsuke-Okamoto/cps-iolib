@@ -1,19 +1,19 @@
 language: C
 
 sudo:
-	- required
+  - required
 
 os:
-	- linux
+  - linux
 
 dist:
-	- trusty
+  - trusty
 
 compiler:
-	- gcc
+  - gcc
 
 scripts:
-	- cd ./drv
-	- sudo make ; make modules_install
-	- cd ../sample
-	- make
+  - cd ./drv
+  - sudo make ; make modules_install
+  - cd ../sample
+  - make
