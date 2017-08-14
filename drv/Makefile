@@ -14,7 +14,7 @@ endif
 EXTRA_CFLAGS	:= -DDEBUG=0
 
 ifeq "$(CPS_SDK_ROOTDIR)" ""
-#KERNELDIR ?= /lib/modules/$(shell uname -r)/build　##target kernel source path ( self build )
+KERNELDIR ?= /lib/modules/$(shell uname -r)/build　##target kernel source path ( self build )
 #KERNELDIR ?= /home/contec/workspace/sdk/CPS_SDK/kernel #target kernel source path ( static path )
 #KERNELDIR ?= ~/CPS_SDK/kernel #target kernel source path ( static path )
 #CPS_IOLIB_REELASE_DIR:=../release/mcs341/
