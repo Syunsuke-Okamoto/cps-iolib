@@ -23,6 +23,7 @@ before_script:
   - cd ./drv
 
 script:
+  - make
   - make modules_install
   - cd ../sample
   - make
