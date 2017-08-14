@@ -11,7 +11,9 @@ dist:
 
 compiler:
   - gcc
-
+before_install:
+  - apt-get install gcc-4.7-arm-linux-gnueabi libncurses5-dev gawk 
+  - apt-get install binutils-arm-linux-gnueabi 
 script:
   - cd ./drv
   - sudo make
