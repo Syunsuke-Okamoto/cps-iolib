@@ -12,7 +12,7 @@ dist:
 compiler:
   - gcc
 
-scripts:
+script:
   - cd ./drv
   - sudo make ; make modules_install
   - cd ../sample
