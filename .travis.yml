@@ -1,0 +1,15 @@
+language: C
+
+sudo:
+	- required
+
+os:
+	- linux
+compiler:
+	- gcc
+
+scripts:
+	cd ./drv
+	sudo make ; make modules_install
+	cd ../sample
+	make
