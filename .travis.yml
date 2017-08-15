@@ -28,6 +28,7 @@ before_script:
   - ls /usr/bin/arm* 
   - make distclean
   - make defconfig CPS-MCS341-DSX.novlan_defconfig
+  - make prepare
   - cd ./scripts/mod
   - make -C $KERNELDIR M=`pwd` modules
   - cd $TRAVIS_BUILD/drv
