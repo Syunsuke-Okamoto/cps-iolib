@@ -35,6 +35,6 @@ before_script:
   
 script:
   - make
-  - make modules_install
+  - sudo make modules_install
   - cd ../sample
   - make
