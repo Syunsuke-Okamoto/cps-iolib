@@ -22,8 +22,13 @@ before_install:
   - export KERNELDIR=$PWD/build
 
 before_script:
-  - cd ./drv
-
+  - cd $KERNELDIR
+  - make distclean
+  - make defconfig CPS-MCS341-DSX.novlan
+  - make modules
+  - ls /usr/bin/arm*
+  - cd ~/drv
+  
 script:
   - make
   - make modules_install
