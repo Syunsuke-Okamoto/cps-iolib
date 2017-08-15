@@ -16,8 +16,8 @@ before_install:
   - sudo apt-get install -y gcc-4.7-arm-linux-gnueabi libncurses5-dev binutils-arm-linux-gnueabi 
 
   # Download the kernel
-  - git clone --depth 1 --branch release https://github.com/CONPROSYS/linux-kernel_3.2.0.CONPROSYS.git
-  - export KERNELDIR=./linux-kernel_3.2.0.CONPROSYS
+  - git clone --depth 1 --branch release https://github.com/CONPROSYS/linux-kernel_3.2.0.CONPROSYS.git $(PWD)/build
+  - export KERNELDIR=$(PWD)/build
 
 before_script:
   - cd ./drv
