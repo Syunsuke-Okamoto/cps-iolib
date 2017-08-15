@@ -24,10 +24,10 @@ before_install:
 
 before_script:
   - cd $KERNELDIR
+  - ls /usr/bin/arm* 
   - make distclean
-  - make defconfig CPS-MCS341-DSX.novlan
+  - make defconfig CPS-MCS341-DSX.novlan_defconfig
   - make modules
-  - ls /usr/bin/arm*
   - cd ~/drv
   
 script:
