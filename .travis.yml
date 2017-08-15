@@ -29,7 +29,7 @@ before_script:
   - make distclean
   - make defconfig CPS-MCS341-DSX.novlan_defconfig
   - make prepare
-  - cd ./scripts/mod
+  - cd ./scripts
   - make -C $KERNELDIR M=`pwd` modules
   - cd $TRAVIS_BUILD_DIR/drv
   
