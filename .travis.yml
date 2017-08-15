@@ -31,7 +31,7 @@ before_script:
   - make prepare
   - cd ./scripts/mod
   - make -C $KERNELDIR M=`pwd` modules
-  - cd $TRAVIS_BUILD/drv
+  - cd $TRAVIS_BUILD_DIR/drv
   
 script:
   - make
